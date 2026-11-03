@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import type { ReactNode } from "react";
 import { ThemeScript } from "@/components/site/theme-script";
+import { ThemeSync } from "@/components/site/theme-sync";
 import { fraunces, inter } from "../fonts";
 
 export const metadata: Metadata = {
@@ -18,7 +19,10 @@ export default async function AdminRootLayout({ children }: { children: ReactNod
       <head>
         <ThemeScript nonce={nonce} />
       </head>
-      <body className="min-h-dvh bg-bg">{children}</body>
+      <body className="min-h-dvh bg-bg">
+        <ThemeSync />
+        {children}
+      </body>
     </html>
   );
 }

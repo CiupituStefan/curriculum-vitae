@@ -173,6 +173,24 @@ test.describe("experience", () => {
     await expect(html).toHaveAttribute("data-theme", after ?? "");
   });
 
+  for (const scheme of ["light", "dark"] as const) {
+    test(`switching language keeps the theme (${scheme} system preference)`, async ({ browser }) => {
+      const context = await browser.newContext({ colorScheme: scheme });
+      const page = await context.newPage();
+      const html = page.locator("html");
+      await page.goto("/ro");
+      if (scheme === "light") await page.getByRole("button", { name: /întunecat/ }).click();
+      await expect(html).toHaveAttribute("data-theme", "dark");
+      await page.getByTestId("language-switch").click();
+      await expect(page).toHaveURL(/\/en$/);
+      await expect(html).toHaveAttribute("data-theme", "dark");
+      await page.getByTestId("language-switch").click();
+      await expect(page).toHaveURL(/\/ro$/);
+      await expect(html).toHaveAttribute("data-theme", "dark");
+      await context.close();
+    });
+  }
+
   test("mobile menu opens and navigates", async ({ page, isMobile }) => {
     test.skip(!isMobile, "mobile only");
     await page.goto("/en");

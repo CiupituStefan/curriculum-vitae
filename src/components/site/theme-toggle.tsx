@@ -2,8 +2,7 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useCallback, useSyncExternalStore } from "react";
-
-type Theme = "light" | "dark";
+import { THEME_STORAGE_KEY, type Theme } from "./theme";
 
 function subscribe(callback: () => void) {
   const observer = new MutationObserver(callback);
@@ -20,7 +19,7 @@ export function ThemeToggle({ labels }: { labels: { light: string; dark: string 
   const toggle = useCallback(() => {
     document.documentElement.dataset.theme = next;
     try {
-      localStorage.setItem("theme", next);
+      localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
       /* storage unavailable (private mode): theme still applies for this page view */
     }

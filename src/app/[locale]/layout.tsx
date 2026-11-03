@@ -10,6 +10,7 @@ import { getCvContent } from "@/server/services/content-service";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { ThemeScript } from "@/components/site/theme-script";
+import { ThemeSync } from "@/components/site/theme-sync";
 import { RevealObserver } from "@/components/site/reveal";
 import { fraunces, inter } from "../fonts";
 
@@ -59,6 +60,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         </main>
         <SiteFooter locale={locale} name={content.profile.fullName} contact={content.contact} dict={dict} />
         <RevealObserver />
+        <ThemeSync />
       </body>
     </html>
   );
