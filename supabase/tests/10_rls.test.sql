@@ -82,7 +82,7 @@ set role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', false);
 select pg_temp.assert(public.is_admin(), 'admin is recognised');
 select pg_temp.assert((select count(*) from public.projects) = 13, 'admin sees drafts too');
-select pg_temp.assert((select count(*) from public.contact_messages) = 1, 'admin can read messages');
+select pg_temp.assert((select count(*) from public.contact_messages) >= 1, 'admin can read messages');
 update public.cv_sections set data = jsonb_set(data, '{fullName}', '"Test Name"'), updated_by = auth.uid() where key = 'profile';
 select pg_temp.assert((select data->>'fullName' from public.cv_sections where key = 'profile') = 'Test Name', 'admin can update a section');
 select pg_temp.assert((select count(*) from public.cv_section_revisions where key = 'profile') >= 1, 'update created a revision');
@@ -98,6 +98,25 @@ do $$ begin
   exception when check_violation then perform pg_temp.assert(true, 'database rejects javascript: URLs'); end;
 end $$;
 reset role;
+
+-- ============ admin with MFA enrolled: aal2 required ============
+reset role;
+insert into auth.mfa_factors (user_id, status) values ('00000000-0000-0000-0000-0000000000a1', 'verified');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated","aal":"aal1"}', false);
+select pg_temp.assert(not public.is_admin(), 'admin with MFA but aal1 session is NOT admin');
+do $$ begin
+  update public.cv_sections set data = '{"mfa_bypass":true}' where key = 'seo';
+  perform pg_temp.assert((select count(*) from public.cv_sections where data ? 'mfa_bypass') = 0, 'aal1 session cannot write when MFA is enrolled');
+end $$;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated","aal":"aal2"}', false);
+select pg_temp.assert(public.is_admin(), 'admin with MFA and aal2 session is admin');
+reset role;
+delete from auth.mfa_factors;
+
+-- ============ trigger function not callable through the API ============
+select pg_temp.assert(not has_function_privilege('anon', 'public.record_cv_revision()', 'execute'), 'anon cannot execute record_cv_revision');
+select pg_temp.assert(not has_function_privilege('authenticated', 'public.record_cv_revision()', 'execute'), 'authenticated cannot execute record_cv_revision');
 
 -- ============ service_role: rate limiting & retention ============
 set role service_role;

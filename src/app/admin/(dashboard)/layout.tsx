@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { LogOut } from "lucide-react";
-import { getCurrentUser, isCurrentUserAdmin } from "@/server/auth";
+import { getCurrentUser, isCurrentUserAdmin, isMfaPending } from "@/server/auth";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { signOutAction } from "../actions";
 
@@ -13,6 +13,7 @@ import { signOutAction } from "../actions";
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const user = await getCurrentUser();
   if (!user) redirect("/admin/login");
+  if (await isMfaPending()) redirect("/admin/login/mfa");
   if (!(await isCurrentUserAdmin())) {
     return (
       <main className="grid min-h-dvh place-items-center px-4">

@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   inserted: [] as unknown[],
   upserts: [] as unknown[],
   allow: true,
+  patterns: [] as string[],
 }));
 
 vi.mock("@/server/env.server", () => ({
@@ -34,6 +35,14 @@ vi.mock("@/server/auth", async () => {
 vi.mock("@/server/repositories/message-repository", () => ({
   messageRepository: {
     insert: async (_db: unknown, row: unknown) => void state.inserted.push(row),
+    listByEmail: async (_db: unknown, pattern: string) => {
+      state.patterns.push(pattern);
+      return [];
+    },
+    removeByEmail: async (_db: unknown, pattern: string) => {
+      state.patterns.push(pattern);
+      return 0;
+    },
     hitRateLimit: async () => state.allow,
     list: async () => [],
     remove: async () => undefined,
@@ -44,7 +53,7 @@ vi.mock("@/server/repositories/content-repository", () => ({
 }));
 vi.mock("@/server/services/email-service", () => ({ sendContactNotification: async () => false }));
 
-import { submitContact, listMessages } from "@/server/services/contact-service";
+import { deleteMessagesByEmail, findMessagesByEmail, submitContact, listMessages } from "@/server/services/contact-service";
 import { saveSection } from "@/server/services/content-service";
 import { seedContent } from "@/domain/content/seed";
 import { AppError } from "@/lib/errors";
@@ -58,6 +67,7 @@ beforeEach(() => {
   state.inserted = [];
   state.upserts = [];
   state.allow = true;
+  state.patterns = [];
 });
 
 describe("contact service", () => {
@@ -65,6 +75,8 @@ describe("contact service", () => {
     await expect(submitContact(valid(), headers)).resolves.toEqual({ delivered: true });
     expect(state.inserted).toHaveLength(1);
     expect(state.inserted[0]).not.toHaveProperty("website");
+    // Proof of consent (GDPR art. 7(1)) is stored with the message.
+    expect(state.inserted[0]).toMatchObject({ privacy_version: expect.stringMatching(/^\d{4}-\d{2}-\d{2}/), consent_at: expect.any(String) });
   });
   it("returns field errors for invalid input and stores nothing", async () => {
     const error = await submitContact({ ...valid(), email: "bad", message: "short" }, headers).catch((e) => e);
@@ -107,5 +119,21 @@ describe("content service authorization", () => {
     await expect(saveSection("seo", { title: { ro: "", en: "" } })).rejects.toMatchObject({ code: "validation" });
     await saveSection("seo", seedContent.seo);
     expect(state.upserts).toEqual([{ key: "seo", value: seedContent.seo }]);
+  });
+});
+
+describe("data-subject requests", () => {
+  it("are admin-only", async () => {
+    await expect(findMessagesByEmail("ana@example.com")).rejects.toMatchObject({ code: "unauthorized" });
+    state.user = { id: "u1", email: "u@example.com" };
+    await expect(deleteMessagesByEmail("ana@example.com")).rejects.toMatchObject({ code: "forbidden" });
+  });
+  it("match one exact address: LIKE wildcards cannot select other people's data", async () => {
+    state.user = { id: "a1", email: "a@example.com" };
+    state.admin = true;
+    await findMessagesByEmail("Ana_Pop@Example.com");
+    expect(state.patterns).toEqual(["ana\\_pop@example.com"]);
+    await expect(findMessagesByEmail("%@example.com")).rejects.toMatchObject({ code: "validation" });
+    await expect(deleteMessagesByEmail("%")).rejects.toMatchObject({ code: "validation" });
   });
 });

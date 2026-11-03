@@ -87,6 +87,10 @@ export function SiteHeader({ locale, name, nav, download }: Props) {
             lang={otherLocale}
             className="btn btn-ghost min-h-0 h-11 px-3 text-xs font-semibold tracking-wider"
             data-testid="language-switch"
+            onClick={() => {
+              // Remember the explicit choice (strictly necessary preference cookie, 1 year).
+              document.cookie = `NEXT_LOCALE=${otherLocale}; path=/; max-age=31536000; samesite=lax${location.protocol === "https:" ? "; secure" : ""}`;
+            }}
           >
             <span className="sr-only">{nav.switchToLanguage} {otherLocale === "en" ? "English" : "română"}: </span>
             <span className={locale === "ro" ? "text-ink" : ""}>RO</span>

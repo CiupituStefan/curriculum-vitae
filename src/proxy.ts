@@ -75,9 +75,10 @@ export async function proxy(request: NextRequest) {
       login.searchParams.set("next", pathname);
       return NextResponse.redirect(login, 307);
     }
-  } else if (isLocale(firstSegment)) {
-    response.cookies.set(LOCALE_COOKIE, firstSegment, { path: "/", sameSite: "lax", secure: true, maxAge: 60 * 60 * 24 * 365 });
   }
+  // The NEXT_LOCALE preference cookie is NOT set here: it is written only when the visitor
+  // explicitly switches language (see components/site/header.tsx), so that it qualifies as a
+  // strictly necessary, user-requested preference (ePrivacy art. 5(3) exemption).
 
   response.headers.set("Content-Security-Policy", csp);
   return response;

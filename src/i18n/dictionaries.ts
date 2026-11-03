@@ -17,6 +17,8 @@ const ro = {
     contactDescription: "Trimite-mi un mesaj pentru oportunități profesionale sau colaborări.",
     privacyTitle: "Politica de confidențialitate",
     privacyDescription: "Cum sunt prelucrate datele personale pe ciupitustefan.com.",
+    cookiesTitle: "Politica de cookie-uri",
+    cookiesDescription: "Ce stochează ciupitustefan.com în browserul tău: doar cookie-uri strict necesare, fără analiză sau publicitate.",
   },
   nav: {
     home: "Acasă",
@@ -205,6 +207,7 @@ const ro = {
   footer: {
     rights: "Toate drepturile rezervate.",
     privacy: "Confidențialitate",
+    cookies: "Cookie-uri",
     backToTop: "Înapoi sus",
   },
   notFound: {
@@ -232,6 +235,8 @@ const en: Dictionary = {
     contactDescription: "Send me a message about job opportunities or collaborations.",
     privacyTitle: "Privacy policy",
     privacyDescription: "How personal data is processed on ciupitustefan.com.",
+    cookiesTitle: "Cookie policy",
+    cookiesDescription: "What ciupitustefan.com stores in your browser: strictly necessary cookies only, no analytics or advertising.",
   },
   nav: {
     home: "Home",
@@ -417,6 +422,7 @@ const en: Dictionary = {
   footer: {
     rights: "All rights reserved.",
     privacy: "Privacy",
+    cookies: "Cookies",
     backToTop: "Back to top",
   },
   notFound: {

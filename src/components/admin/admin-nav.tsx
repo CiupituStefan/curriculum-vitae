@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, FileText, FolderKanban, Inbox, LayoutDashboard, PenLine } from "lucide-react";
+import { ExternalLink, FileText, FolderKanban, Inbox, LayoutDashboard, PenLine, ShieldCheck } from "lucide-react";
 import { SECTION_KEYS } from "@/domain/content/schema";
 import { SECTION_FORMS } from "./section-forms";
 
@@ -30,6 +30,7 @@ export function AdminNav() {
         {item("/admin/projects", "Proiecte", <FolderKanban size={16} aria-hidden="true" />)}
         {item("/admin/messages", "Mesaje", <Inbox size={16} aria-hidden="true" />)}
         {item("/admin/documents", "CV-uri PDF", <FileText size={16} aria-hidden="true" />)}
+        {item("/admin/security", "Securitate", <ShieldCheck size={16} aria-hidden="true" />)}
       </ul>
       <p className="mt-6 px-2.5 text-xs font-semibold uppercase tracking-wider text-muted">Conținut CV</p>
       <ul className="mt-2 space-y-0.5">

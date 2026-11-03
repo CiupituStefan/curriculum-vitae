@@ -43,7 +43,10 @@ export default async function PrivacyPage({ params }: Props) {
         ))}
       </div>
       <p className="mt-12 border-t border-line pt-6 text-sm text-muted">
-        {locale === "ro" ? "Ultima actualizare" : "Last updated"}: <time dateTime={PRIVACY_UPDATED}>{PRIVACY_UPDATED.slice(8)} {formatMonth(PRIVACY_UPDATED.slice(0, 7), locale)}</time>
+        <a href={`/${locale}/cookies`} className="underline underline-offset-2">
+          {dict.meta.cookiesTitle}
+        </a>{" "}
+        · {locale === "ro" ? "Ultima actualizare" : "Last updated"}: <time dateTime={PRIVACY_UPDATED}>{PRIVACY_UPDATED.slice(8)} {formatMonth(PRIVACY_UPDATED.slice(0, 7), locale)}</time>
       </p>
     </article>
   );

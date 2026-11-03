@@ -134,8 +134,33 @@ test.describe("contact form", () => {
   });
 });
 
+test.describe("privacy: storage only on explicit choice @smoke", () => {
+  test("a plain visit stores nothing in the browser", async ({ page, context }) => {
+    await page.goto("/ro");
+    await page.goto("/en/cv");
+    expect(await context.cookies()).toEqual([]);
+    expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
+  });
+
+  test("the language cookie is set only after using the language switch", async ({ page, context }) => {
+    await page.goto("/ro");
+    await page.getByTestId("language-switch").click();
+    await expect(page).toHaveURL(/\/en$/);
+    const cookie = (await context.cookies()).find((c) => c.name === "NEXT_LOCALE");
+    expect(cookie?.value).toBe("en");
+    expect(cookie?.sameSite).toBe("Lax");
+  });
+
+  test("the cookie policy lists every stored item and no tracking", async ({ page }) => {
+    await page.goto("/en/cookies");
+    await expect(page.getByRole("heading", { level: 1, name: "Cookie policy" })).toBeVisible();
+    for (const name of ["NEXT_LOCALE", "theme", "sb-…-auth-token"]) await expect(page.getByRole("rowheader", { name })).toBeVisible();
+    await expect(page.getByRole("contentinfo").getByRole("link", { name: "Cookies" })).toBeVisible();
+  });
+});
+
 test.describe("admin area is protected", () => {
-  for (const path of ["/admin", "/admin/projects", "/admin/content/profile", "/admin/messages"]) {
+  for (const path of ["/admin", "/admin/projects", "/admin/content/profile", "/admin/messages", "/admin/security", "/admin/login/mfa", "/admin/privacy-export?email=a@example.com"]) {
     test(`${path} redirects anonymous visitors to the login page @smoke`, async ({ page }) => {
       await page.goto(path);
       await expect(page).toHaveURL(/\/admin\/login\?next=/);

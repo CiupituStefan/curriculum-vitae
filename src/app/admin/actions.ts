@@ -9,7 +9,8 @@ import { projectCategories, projectStatus } from "@/domain/projects/schema";
 import { restoreRevision, saveSection } from "@/server/services/content-service";
 import { createProject, deleteProject, updateProject } from "@/server/services/project-service";
 import { addProjectAttachment, addProjectImage, removeProjectFile } from "@/server/services/project-media-service";
-import { deleteMessage } from "@/server/services/contact-service";
+import { deleteMessage, deleteMessagesByEmail } from "@/server/services/contact-service";
+import { confirmEnrollment, removeFactor, startEnrollment } from "@/server/services/mfa-service";
 import { sessionClient } from "@/server/supabase/clients";
 
 /*
@@ -153,6 +154,14 @@ export async function deleteMessageAction(formData: FormData): Promise<void> {
   revalidatePath("/admin/messages");
 }
 
+/** Erasure request: deletes every contact message from one e-mail address. */
+export async function deleteMessagesByEmailAction(formData: FormData): Promise<void> {
+  const email = text(formData, "email");
+  const deleted = await deleteMessagesByEmail(email);
+  revalidatePath("/admin/messages");
+  redirect(`/admin/messages?erased=${deleted}`);
+}
+
 /* -------------------------------- Session ------------------------------- */
 
 export async function signOutAction(): Promise<void> {
@@ -163,4 +172,34 @@ export async function signOutAction(): Promise<void> {
     logger.warn("auth.signout_failed", { error });
   }
   redirect("/admin/login");
+}
+
+/* ---------------------------------- MFA --------------------------------- */
+
+export type EnrollState =
+  | { step: "idle"; error?: string }
+  | { step: "scan"; factorId: string; qrCode: string; secret: string; error?: string }
+  | { step: "done" };
+
+export async function startMfaEnrollmentAction(): Promise<EnrollState> {
+  try {
+    return { step: "scan", ...(await startEnrollment()) };
+  } catch (error) {
+    return { step: "idle", error: toErrorCode(error) };
+  }
+}
+
+export async function confirmMfaEnrollmentAction(factorId: string, code: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await confirmEnrollment(factorId, code.replace(/\s+/g, ""));
+    revalidatePath("/admin/security");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: toErrorCode(error) };
+  }
+}
+
+export async function removeMfaFactorAction(formData: FormData): Promise<void> {
+  await removeFactor(text(formData, "factorId"));
+  revalidatePath("/admin/security");
 }

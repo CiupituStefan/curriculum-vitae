@@ -22,6 +22,9 @@ export function SiteFooter({ locale, name, contact, dict }: Props) {
           <Link href={`/${locale}/privacy`} className="link-underline text-sm text-muted hover:text-ink">
             {dict.footer.privacy}
           </Link>
+          <Link href={`/${locale}/cookies`} className="link-underline text-sm text-muted hover:text-ink">
+            {dict.footer.cookies}
+          </Link>
           <a href="#main" className="link-underline text-sm text-muted hover:text-ink">
             {dict.footer.backToTop}
           </a>
