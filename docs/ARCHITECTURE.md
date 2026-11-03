@@ -54,7 +54,7 @@ flowchart LR
     V[Vizitator / recrutor]
     A[Administrator]
   end
-  subgraph Vercel["Vercel (fra1)"]
+  subgraph Vercel["Vercel (iad1)"]
     P[proxy.ts<br/>limbă · CSP nonce · sesiune]
     RSC[Server Components<br/>pagini publice + admin]
     SA[Server Actions<br/>contact · admin CRUD · upload]

@@ -12,7 +12,8 @@
 
 ## 2. Supabase
 
-1. <https://supabase.com/dashboard> → **New project**. Regiune: **Central EU (Frankfurt)** (date în UE, aproape de Vercel `fra1`).
+1. Proiectul Supabase există deja: `supabase-bisque-engine` (`iacwbipueylgsolgeccr`), creat prin integrarea Vercel, regiunea **East US (North Virginia)**.
+   Funcțiile Vercel rulează în aceeași zonă (`iad1`) pentru latență minimă. Pentru un proiect nou, alege regiunea și actualizează `regions` în `vercel.json`.
    Parola bazei de date: generată și păstrată într-un manager de parole.
 2. **SQL Editor** → rulează, în ordine, conținutul fișierelor:
    - `supabase/migrations/20261103000000_init.sql` (tabele, RLS, funcții, bucket-ul `portfolio`, politicile Storage)
@@ -60,7 +61,7 @@
 3. **Settings → Git → Production Branch**: `main` (după ce îl creezi, vezi `CI-CD.md` §6).
 4. **Settings → Deployment Protection**: păstrează Vercel Authentication pentru preview-uri; generează „Protection Bypass for Automation”
    și salvează-l în GitHub ca `VERCEL_AUTOMATION_BYPASS_SECRET`.
-5. Deploy. `vercel.json` fixează regiunea `fra1` și cronul zilnic `/api/cron/retention` (03:17 UTC).
+5. Deploy. `vercel.json` fixează regiunea `iad1` (aceeași zonă ca baza de date) și cronul zilnic `/api/cron/retention` (03:17 UTC).
 
 ## 4. Domeniul (Google Cloud → Vercel)
 
