@@ -3,6 +3,7 @@ import { logger } from "@/lib/logger";
 import { messageRepository } from "@/server/repositories/message-repository";
 import { serviceClient } from "@/server/supabase/clients";
 import { serverEnv } from "@/server/env.server";
+import { recordSecurityEvent } from "@/server/services/security-events";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,7 @@ export async function GET(request: Request) {
   try {
     const deleted = await messageRepository.purgeExpired(serviceClient(), serverEnv.CONTACT_RETENTION_DAYS);
     logger.info("retention.purged", { deleted });
+    await recordSecurityEvent("retention.purged", { deleted });
     return Response.json({ ok: true, deleted });
   } catch (error) {
     logger.error("retention.failed", { error });

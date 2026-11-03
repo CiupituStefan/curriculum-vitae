@@ -49,7 +49,9 @@ export const seedContent: CvContent = {
 
   contact: {
     email: "ciupitustefan12@gmail.com",
-    phone: "+40 773 735 023",
+    // Not published in this public repository: the owner sets it from the admin panel, where it
+    // is stored in the admin-only table public.cv_private unless they choose to publish it.
+    phone: "",
     showPhone: false,
     showPhoneInPdf: false,
     linkedin: "https://www.linkedin.com/in/ciupitu-stefan-emanuel/",

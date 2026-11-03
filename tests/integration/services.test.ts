@@ -11,6 +11,7 @@ const state = vi.hoisted(() => ({
   upserts: [] as unknown[],
   allow: true,
   patterns: [] as string[],
+  privates: [] as unknown[],
 }));
 
 vi.mock("@/server/env.server", () => ({
@@ -49,9 +50,13 @@ vi.mock("@/server/repositories/message-repository", () => ({
   },
 }));
 vi.mock("@/server/repositories/content-repository", () => ({
-  contentRepository: { upsertSection: async (_db: unknown, key: string, value: unknown) => void state.upserts.push({ key, value }) },
+  contentRepository: {
+    upsertSection: async (_db: unknown, key: string, value: unknown) => void state.upserts.push({ key, value }),
+    upsertPrivate: async (_db: unknown, key: string, value: unknown) => void state.privates.push({ key, value }),
+  },
 }));
 vi.mock("@/server/services/email-service", () => ({ sendContactNotification: async () => false }));
+vi.mock("@/server/services/security-events", () => ({ recordSecurityEvent: async () => undefined }));
 
 import { deleteMessagesByEmail, findMessagesByEmail, submitContact, listMessages } from "@/server/services/contact-service";
 import { saveSection } from "@/server/services/content-service";
@@ -68,6 +73,7 @@ beforeEach(() => {
   state.upserts = [];
   state.allow = true;
   state.patterns = [];
+  state.privates = [];
 });
 
 describe("contact service", () => {
@@ -135,5 +141,24 @@ describe("data-subject requests", () => {
     expect(state.patterns).toEqual(["ana\\_pop@example.com"]);
     await expect(findMessagesByEmail("%@example.com")).rejects.toMatchObject({ code: "validation" });
     await expect(deleteMessagesByEmail("%")).rejects.toMatchObject({ code: "validation" });
+  });
+});
+
+describe("unpublished data never reaches the public CV section (A.8.2.3 / A.18.1.4)", () => {
+  const admin = () => {
+    state.user = { id: "a1", email: "a@example.com" };
+    state.admin = true;
+  };
+  it("keeps a hidden phone number only in the admin-only private table", async () => {
+    admin();
+    await saveSection("contact", { ...seedContent.contact, phone: "+40 700 000 000", showPhone: false, showPhoneInPdf: false });
+    expect(state.upserts).toEqual([{ key: "contact", value: expect.objectContaining({ phone: "" }) }]);
+    expect(state.privates).toEqual([{ key: "contact", value: { phone: "+40 700 000 000" } }]);
+  });
+  it("publishes the phone only when the owner opts in", async () => {
+    admin();
+    await saveSection("contact", { ...seedContent.contact, phone: "+40 700 000 000", showPhone: true, showPhoneInPdf: false });
+    expect(state.upserts[0]).toEqual({ key: "contact", value: expect.objectContaining({ phone: "+40 700 000 000" }) });
+    expect(state.privates).toEqual([{ key: "contact", value: { phone: "" } }]);
   });
 });

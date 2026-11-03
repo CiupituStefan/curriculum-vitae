@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger";
 import { getCurrentUser, isMfaPending, requireAdmin } from "@/server/auth";
 import { sessionClient } from "@/server/supabase/clients";
 import { enforceRateLimits } from "./rate-limit-service";
+import { recordSecurityEvent } from "./security-events";
 
 /*
  * TOTP multi-factor authentication for the administrator (Supabase Auth MFA).
@@ -50,6 +51,7 @@ async function verifyCode(factorId: string, code: string, email: string): Promis
   const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code });
   if (error) {
     logger.warn("auth.mfa_verify_failed", { reason: error.code ?? "unknown" });
+    await recordSecurityEvent("auth.mfa_verify_failed", { reason: error.code ?? "unknown" });
     throw new AppError("validation", "invalid_code");
   }
 }
@@ -60,6 +62,7 @@ export async function confirmEnrollment(factorId: string, code: string): Promise
   if (!/^[0-9a-f-]{36}$/.test(factorId)) throw new AppError("validation");
   await verifyCode(factorId, code, user.email ?? user.id);
   logger.info("auth.mfa_enrolled");
+  await recordSecurityEvent("auth.mfa_enrolled", {}, { actor: user.id });
 }
 
 /** Second login step: verifies the code for the account's verified TOTP factor. */
@@ -73,14 +76,16 @@ export async function verifyLoginCode(code: string): Promise<void> {
   if (error || !factor) throw new AppError("internal", "no verified factor");
   await verifyCode(factor.id, code, user.email ?? user.id);
   logger.info("auth.mfa_login_succeeded");
+  await recordSecurityEvent("auth.mfa_login_succeeded", {}, { actor: user.id });
 }
 
 /** Removes a factor. Requires an aal2 session (enforced by requireAdmin while MFA is enabled). */
 export async function removeFactor(factorId: string): Promise<void> {
-  await requireAdmin();
+  const { user } = await requireAdmin();
   if (!/^[0-9a-f-]{36}$/.test(factorId)) throw new AppError("validation");
   const supabase = await sessionClient();
   const { error } = await supabase.auth.mfa.unenroll({ factorId });
   if (error) throw new AppError("internal", error.message);
   logger.warn("auth.mfa_removed");
+  await recordSecurityEvent("auth.mfa_removed", {}, { actor: user.id });
 }

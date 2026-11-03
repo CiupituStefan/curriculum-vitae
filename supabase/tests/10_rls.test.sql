@@ -140,3 +140,33 @@ select pg_temp.assert((select count(*) from public.contact_messages) = 1, 'recen
 select pg_temp.assert(
   (select count(*) from pg_tables where schemaname = 'public' and not rowsecurity) = 0,
   'RLS enabled on every public table');
+
+-- ============ ISO audit 2026-11: private data & security log ============
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  begin perform count(*) from public.cv_private;
+    raise exception 'ASSERTION FAILED: anon could read cv_private';
+  exception when insufficient_privilege then perform pg_temp.assert(true, 'anon cannot read private CV data'); end;
+  begin perform count(*) from public.security_events;
+    raise exception 'ASSERTION FAILED: anon could read security_events';
+  exception when insufficient_privilege then perform pg_temp.assert(true, 'anon cannot read the security log'); end;
+end $$;
+select pg_temp.assert(coalesce((select data->>'phone' from public.cv_sections where key='contact'), '') = '', 'unpublished phone is not in the public CV section');
+reset role;
+insert into public.security_events (event, details) values ('auth.login_failed', '{"reason":"test"}');
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000b2","role":"authenticated"}', false);
+select pg_temp.assert((select count(*) from public.security_events) = 0, 'ordinary user cannot read the security log');
+select pg_temp.assert((select count(*) from public.cv_private) = 0, 'ordinary user cannot read private CV data');
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated","aal":"aal1"}', false);
+select pg_temp.assert((select count(*) from public.security_events) = 1, 'admin can read the security log');
+do $$ begin
+  begin insert into public.security_events (event) values ('forged.event');
+    raise exception 'ASSERTION FAILED: admin could forge security events';
+  exception when insufficient_privilege then perform pg_temp.assert(true, 'security log cannot be written through the API, not even by the admin'); end;
+  begin delete from public.security_events;
+    raise exception 'ASSERTION FAILED: admin could delete the security log';
+  exception when insufficient_privilege then perform pg_temp.assert(true, 'security log cannot be deleted through the API'); end;
+end $$;
+reset role;

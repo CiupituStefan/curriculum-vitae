@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { History } from "lucide-react";
 import { isSectionKey } from "@/domain/content/schema";
 import { requireAdmin } from "@/server/auth";
-import { getCvContent, listSectionRevisions } from "@/server/services/content-service";
+import { getSectionForAdmin, listSectionRevisions } from "@/server/services/content-service";
 import { SectionEditor } from "@/components/admin/section-editor";
 import { SECTION_FORMS } from "@/components/admin/section-forms";
 import { Notice } from "@/components/admin/notice";
@@ -21,7 +21,7 @@ export default async function SectionPage({ params, searchParams }: Props) {
   const { section } = await params;
   if (!isSectionKey(section)) notFound();
   const { restored } = await searchParams;
-  const [{ content }, revisions] = await Promise.all([getCvContent(), listSectionRevisions(section)]);
+  const [initial, revisions] = await Promise.all([getSectionForAdmin(section), listSectionRevisions(section)]);
   const form = SECTION_FORMS[section];
 
   return (
@@ -36,7 +36,7 @@ export default async function SectionPage({ params, searchParams }: Props) {
       ) : null}
 
       <div className="mt-8">
-        <SectionEditor key={revisions[0]?.id ?? "initial"} section={section} initial={content[section]} writable />
+        <SectionEditor key={revisions[0]?.id ?? "initial"} section={section} initial={initial} writable />
       </div>
 
       <section className="mt-12" aria-labelledby="history-title">

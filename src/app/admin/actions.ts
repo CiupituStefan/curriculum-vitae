@@ -12,6 +12,7 @@ import { addProjectAttachment, addProjectImage, removeProjectFile } from "@/serv
 import { deleteMessage, deleteMessagesByEmail } from "@/server/services/contact-service";
 import { confirmEnrollment, removeFactor, startEnrollment } from "@/server/services/mfa-service";
 import { sessionClient } from "@/server/supabase/clients";
+import { recordSecurityEvent } from "@/server/services/security-events";
 
 /*
  * Admin Server Actions. Each one delegates to a service that calls requireAdmin() first, so
@@ -167,7 +168,9 @@ export async function deleteMessagesByEmailAction(formData: FormData): Promise<v
 export async function signOutAction(): Promise<void> {
   try {
     const supabase = await sessionClient();
+    const { data } = await supabase.auth.getUser();
     await supabase.auth.signOut();
+    await recordSecurityEvent("auth.signed_out", {}, { actor: data.user?.id });
   } catch (error) {
     logger.warn("auth.signout_failed", { error });
   }

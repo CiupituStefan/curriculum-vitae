@@ -9,6 +9,7 @@ import { projectRepository, rowToProject, type ProjectRow } from "@/server/repos
 import { publicClient, sessionClient } from "@/server/supabase/clients";
 import { requireAdmin } from "@/server/auth";
 import { storageService } from "./storage-service";
+import { recordSecurityEvent } from "./security-events";
 
 function toProjects(rows: ProjectRow[]): Project[] {
   const projects: Project[] = [];
@@ -66,6 +67,7 @@ export async function createProject(value: unknown): Promise<string> {
   const { user } = await requireAdmin();
   const id = await projectRepository.create(await sessionClient(), validateInput(value), user.id);
   logger.info("projects.created", { id });
+  await recordSecurityEvent("admin.project_created", { id }, { actor: user.id });
   return id;
 }
 
@@ -73,10 +75,11 @@ export async function updateProject(id: string, value: unknown): Promise<void> {
   const { user } = await requireAdmin();
   await projectRepository.update(await sessionClient(), id, validateInput(value), user.id);
   logger.info("projects.updated", { id });
+  await recordSecurityEvent("admin.project_updated", { id }, { actor: user.id });
 }
 
 export async function deleteProject(id: string): Promise<void> {
-  await requireAdmin();
+  const { user } = await requireAdmin();
   const project = await adminGetProject(id);
   await projectRepository.remove(await sessionClient(), id);
   const paths = [project.cover, ...project.gallery, ...project.attachments]
@@ -84,4 +87,5 @@ export async function deleteProject(id: string): Promise<void> {
     .map((item) => item.path);
   await storageService.remove(paths);
   logger.info("projects.deleted", { id, files: paths.length });
+  await recordSecurityEvent("admin.project_deleted", { id, files: paths.length }, { actor: user.id });
 }

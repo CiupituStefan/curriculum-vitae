@@ -8,6 +8,7 @@ import { serviceClient, sessionClient } from "@/server/supabase/clients";
 import { requireAdmin } from "@/server/auth";
 import { enforceRateLimits } from "./rate-limit-service";
 import { sendContactNotification } from "./email-service";
+import { recordSecurityEvent } from "./security-events";
 
 export type ContactOutcome = { delivered: true };
 
@@ -33,7 +34,12 @@ export async function submitContact(raw: unknown, headers: Headers): Promise<Con
   }
   if (verdict === "too_fast") throw new AppError("too_fast");
 
-  await enforceRateLimits({ bucket: "contact", by: "ip", headers }, { bucket: "contactGlobal", by: "global" });
+  try {
+    await enforceRateLimits({ bucket: "contact", by: "ip", headers }, { bucket: "contactGlobal", by: "global" });
+  } catch (error) {
+    if (error instanceof AppError && error.code === "rate_limited") await recordSecurityEvent("contact.rate_limited", {}, { headers });
+    throw error;
+  }
 
   const record = {
     name: input.name,
@@ -57,9 +63,10 @@ export async function listMessages() {
 }
 
 export async function deleteMessage(id: string) {
-  await requireAdmin();
+  const { user } = await requireAdmin();
   if (!/^[0-9a-f-]{36}$/.test(id)) throw new AppError("validation");
   await messageRepository.remove(await sessionClient(), id);
+  await recordSecurityEvent("admin.message_deleted", {}, { actor: user.id });
 }
 
 /* ------------- Data-subject requests (GDPR art. 15 access, 16/17 erasure, 20 portability) ------------- */
@@ -76,9 +83,18 @@ export async function findMessagesByEmail(email: string) {
   return messageRepository.listByEmail(await sessionClient(), normalizeEmail(email));
 }
 
+/** Same as findMessagesByEmail, and records the export in the security log (accountability). */
+export async function exportMessagesByEmail(email: string) {
+  const { user } = await requireAdmin();
+  const records = await messageRepository.listByEmail(await sessionClient(), normalizeEmail(email));
+  await recordSecurityEvent("privacy.data_exported", { records: records.length }, { actor: user.id });
+  return records;
+}
+
 export async function deleteMessagesByEmail(email: string): Promise<number> {
-  await requireAdmin();
+  const { user } = await requireAdmin();
   const deleted = await messageRepository.removeByEmail(await sessionClient(), normalizeEmail(email));
   logger.info("privacy.erasure_completed", { deleted });
+  await recordSecurityEvent("privacy.data_erased", { deleted }, { actor: user.id });
   return deleted;
 }

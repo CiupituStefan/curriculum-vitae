@@ -8,6 +8,7 @@ import { sessionClient } from "@/server/supabase/clients";
 import { requireAdmin } from "@/server/auth";
 import { adminGetProject } from "./project-service";
 import { storageService } from "./storage-service";
+import { recordSecurityEvent } from "./security-events";
 
 const MAX_GALLERY = 24;
 const MAX_ATTACHMENTS = 12;
@@ -33,6 +34,7 @@ export async function addProjectImage(projectId: string, file: File, target: "co
   await save(projectId, user.id, project);
   if (target === "cover" && previousCover) await storageService.remove([previousCover.path]);
   logger.info("projects.media_added", { id: projectId, target });
+  await recordSecurityEvent("admin.file_uploaded", { project: projectId, target }, { actor: user.id });
 }
 
 export async function addProjectAttachment(projectId: string, file: File) {
@@ -43,6 +45,7 @@ export async function addProjectAttachment(projectId: string, file: File) {
   project.attachments.push({ ...stored, name: sanitizeFileName(file.name) });
   await save(projectId, user.id, project);
   logger.info("projects.attachment_added", { id: projectId });
+  await recordSecurityEvent("admin.file_uploaded", { project: projectId, target: "attachment" }, { actor: user.id });
 }
 
 /** Removes one media item. The path must belong to this project's record (prevents IDOR on storage). */
@@ -60,4 +63,5 @@ export async function removeProjectFile(projectId: string, path: string) {
   await save(projectId, user.id, project);
   await storageService.remove([path]);
   logger.info("projects.media_removed", { id: projectId });
+  await recordSecurityEvent("admin.file_removed", { project: projectId }, { actor: user.id });
 }

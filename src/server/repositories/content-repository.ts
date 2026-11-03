@@ -21,6 +21,20 @@ export const contentRepository = {
     if (error) throw new AppError(error.code === "42501" ? "forbidden" : "internal", error.message);
   },
 
+  /** Admin-only private data (RLS: is_admin()). Returns null when nothing is stored. */
+  async getPrivate(db: SupabaseClient, key: "contact"): Promise<Record<string, unknown> | null> {
+    const { data, error } = await db.from("cv_private").select("data").eq("key", key).maybeSingle();
+    if (error) throw new AppError("internal", error.message);
+    return (data?.data as Record<string, unknown> | undefined) ?? null;
+  },
+
+  async upsertPrivate(db: SupabaseClient, key: "contact", value: Record<string, unknown>, userId: string): Promise<void> {
+    const { error } = await db
+      .from("cv_private")
+      .upsert({ key, data: value, updated_by: userId, updated_at: new Date().toISOString() }, { onConflict: "key" });
+    if (error) throw new AppError(error.code === "42501" ? "forbidden" : "internal", error.message);
+  },
+
   async listRevisions(db: SupabaseClient, key: SectionKey, limit = 20): Promise<RevisionRow[]> {
     const { data, error } = await db
       .from("cv_section_revisions")

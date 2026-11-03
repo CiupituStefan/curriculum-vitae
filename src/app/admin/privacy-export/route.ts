@@ -1,5 +1,5 @@
 import { AppError, HTTP_STATUS, toErrorCode } from "@/lib/errors";
-import { findMessagesByEmail } from "@/server/services/contact-service";
+import { exportMessagesByEmail } from "@/server/services/contact-service";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const email = new URL(request.url).searchParams.get("email") ?? "";
   try {
-    const records = await findMessagesByEmail(email);
+    const records = await exportMessagesByEmail(email);
     const body = JSON.stringify(
       {
         controller: "Ștefan-Emanuel Ciupitu — ciupitustefan.com",

@@ -8,6 +8,7 @@ import { SECTION_KEYS, isSectionKey, parseSection, type CvContent, type SectionK
 import { contentRepository } from "@/server/repositories/content-repository";
 import { publicClient, sessionClient } from "@/server/supabase/clients";
 import { requireAdmin } from "@/server/auth";
+import { recordSecurityEvent } from "./security-events";
 
 export type ContentSource = "database" | "seed";
 
@@ -45,8 +46,30 @@ export async function saveSection(key: SectionKey, value: unknown): Promise<void
     );
     throw new AppError("validation", "Invalid section", fieldErrors);
   }
-  await contentRepository.upsertSection(await sessionClient(), key, parsed.data, user.id);
+  const db = await sessionClient();
+  let publicValue: unknown = parsed.data;
+  if (key === "contact") {
+    // Data the owner did not choose to publish never goes into the publicly readable section
+    // (A.8.2.3 / A.18.1.4): an unpublished phone number is kept in the admin-only cv_private table.
+    const contact = parsed.data as CvContent["contact"];
+    const publishPhone = contact.showPhone || contact.showPhoneInPdf;
+    await contentRepository.upsertPrivate(db, "contact", { phone: publishPhone ? "" : contact.phone }, user.id);
+    publicValue = { ...contact, phone: publishPhone ? contact.phone : "" };
+  }
+  await contentRepository.upsertSection(db, key, publicValue, user.id);
   logger.info("content.section_saved", { section: key });
+  await recordSecurityEvent("admin.content_saved", { section: key }, { actor: user.id });
+}
+
+/** Section value for the admin editor, including admin-only private fields. */
+export async function getSectionForAdmin<K extends SectionKey>(key: K): Promise<CvContent[K]> {
+  await requireAdmin();
+  const { content } = await getCvContent();
+  if (key !== "contact") return content[key];
+  const privateData = await contentRepository.getPrivate(await sessionClient(), "contact");
+  const phone = typeof privateData?.phone === "string" ? privateData.phone : "";
+  const contact = content.contact;
+  return { ...contact, phone: contact.phone || phone } as CvContent[K];
 }
 
 export async function listSectionRevisions(key: SectionKey) {
@@ -60,5 +83,6 @@ export async function restoreRevision(revisionId: number): Promise<SectionKey> {
   const revision = await contentRepository.getRevision(await sessionClient(), revisionId);
   if (!revision || !isSectionKey(revision.key)) throw new AppError("not_found");
   await saveSection(revision.key, revision.data);
+  await recordSecurityEvent("admin.revision_restored", { section: revision.key, revisionId });
   return revision.key;
 }

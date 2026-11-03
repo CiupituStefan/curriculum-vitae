@@ -11,6 +11,7 @@ import { isMfaPending } from "@/server/auth";
 import { verifyLoginCode } from "@/server/services/mfa-service";
 import { enforceRateLimits } from "@/server/services/rate-limit-service";
 import { sessionClient } from "@/server/supabase/clients";
+import { recordSecurityEvent } from "@/server/services/security-events";
 
 export type LoginState = { error?: "invalid" | "rate_limited" | "unavailable" | "forbidden" };
 export type MfaState = { error?: "invalid_code" | "rate_limited" | "unavailable" };
@@ -36,7 +37,10 @@ export async function signInAction(_previous: LoginState, formData: FormData): P
       { bucket: "loginGlobal", by: "global" },
     );
   } catch (error) {
-    if (toErrorCode(error) === "rate_limited") logger.warn("auth.login_rate_limited");
+    if (toErrorCode(error) === "rate_limited") {
+      logger.warn("auth.login_rate_limited");
+      await recordSecurityEvent("auth.login_rate_limited", {}, { headers: await headers() });
+    }
     return { error: toErrorCode(error) === "rate_limited" ? "rate_limited" : "unavailable" };
   }
 
@@ -44,6 +48,7 @@ export async function signInAction(_previous: LoginState, formData: FormData): P
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     logger.warn("auth.login_failed", { reason: error.code ?? "unknown" });
+    await recordSecurityEvent("auth.login_failed", { reason: error.code ?? "unknown" }, { headers: await headers() });
     return { error: "invalid" };
   }
   if (await isMfaPending()) {
@@ -53,9 +58,12 @@ export async function signInAction(_previous: LoginState, formData: FormData): P
   if (isAdmin !== true) {
     await supabase.auth.signOut();
     logger.warn("auth.login_not_admin");
+    await recordSecurityEvent("auth.login_not_admin", {}, { headers: await headers() });
     return { error: "forbidden" };
   }
   logger.info("auth.login_succeeded");
+  const { data: who } = await supabase.auth.getUser();
+  await recordSecurityEvent("auth.login_succeeded", { mfa: false }, { actor: who.user?.id, headers: await headers() });
   redirect(next);
 }
 
