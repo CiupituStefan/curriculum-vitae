@@ -92,13 +92,13 @@ Suprafețe: paginile publice și parametrii lor (`locale`, `slug`, `?category`);
 |---|---|---|---|
 | 1 | Revizuirea arhitecturii | Manual (`ARCHITECTURE.md`) | Efectuat |
 | 2 | Threat modeling | STRIDE (§2) | Efectuat |
-| 3 | Analiza codului | ESLint (Next, TS, a11y, `no-danger`, `no-explicit-any`) — 0 erori, 0 avertismente; TypeScript strict — 0 erori; revizuire manuală a fiecărui punct de intrare | Efectuat. CodeQL configurat în CI (rezultatele apar în tab-ul Security după rulare) |
+| 3 | Analiza codului | ESLint (Next, TS, a11y, `no-danger`, `no-explicit-any`) — 0 erori, 0 avertismente; TypeScript strict — 0 erori; revizuire manuală a fiecărui punct de intrare | Efectuat. CodeQL (`security-extended`, JS/TS + Actions) a rulat cu succes în GitHub Actions pe 03.11.2026; eventualele alerte apar în GitHub → Security → Code scanning |
 | 4 | Autentificare | Teste E2E: rutele `/admin/*` redirecționează la login; login blocat fără configurare; open redirect neutralizat | Efectuat local. **Login real cu Supabase: neefectuat** (necesită proiectul Supabase) |
 | 5 | Autorizare | Teste de integrare: `saveSection`/`listMessages` resping anonim (401) și non-admin (403); validare pe server pentru admin | Efectuat |
 | 6 | RLS | 37 de aserțiuni SQL pe PostgreSQL 16 real (rolurile anon/authenticated/service_role emulate): citiri, scrieri, escaladare, funcții privilegiate, storage, retenție | Efectuat — toate trec. **Pe proiectul Supabase real: de rulat** (vezi `DEPLOYMENT.md` §2.5) |
 | 7 | Upload | Teste unit: magic bytes, HTML/SVG/EXE deghizate, PDF cu JS/Launch, limită de mărime, nume de fișiere | Efectuat (validare). Upload end-to-end în Storage: **neefectuat** |
 | 8 | Dependențe | `npm audit --omit=dev`: **0 vulnerabilități**. `npm audit` complet: 16 moderate, toate tranzitive în ESLint (`minimatch` ReDoS), doar dev | Efectuat |
-| 9 | Detectarea secretelor | Scanare regex locală (chei Supabase, JWT, Resend, AWS, GitHub, chei private, parole) — doar fixture-uri de test; Gitleaks în CI pe tot istoricul | Efectuat local; Gitleaks rulează în CI |
+| 9 | Detectarea secretelor | Scanare regex locală (chei Supabase, JWT, Resend, AWS, GitHub, chei private, parole) — doar fixture-uri de test; Gitleaks în CI pe tot istoricul | Efectuat local + Gitleaks în GitHub Actions pe tot istoricul (03.11.2026): fără scurgeri |
 | 10 | HTTPS / TLS | — | **Neefectuat**: domeniul nu este încă conectat la Vercel |
 | 11 | Antete HTTP | Test E2E care verifică CSP, XFO, nosniff, HSTS, Referrer-Policy, absența `X-Powered-By` | Efectuat (local). ZAP baseline configurat post-deploy |
 | 12 | Testarea API-urilor | Integrare + E2E: `/api/cv` (8 variante, 404 pentru parametri invalizi/path traversal), `/api/health` (fără detalii interne), `/api/cron/retention` (401 fără/cu secret greșit) | Efectuat |
