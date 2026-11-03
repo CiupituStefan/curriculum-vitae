@@ -1,0 +1,6 @@
+title = "ciupiustefan.com gitleaks config"
+[extend]
+useDefault = true
+[allowlist]
+description = "Test fixtures with obviously fake values"
+paths = ['''tests/integration/services\.test\.ts''', '''tests/unit/security\.test\.ts''']
