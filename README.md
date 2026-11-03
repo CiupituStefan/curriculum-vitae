@@ -1,4 +1,4 @@
-# ciupiustefan.com — CV online, portofoliu și panou de administrare
+# ciupitustefan.com — CV online, portofoliu și panou de administrare
 
 Site personal profesional al lui **Ștefan-Emanuel Ciupitu**: CV interactiv bilingv (RO/EN), portofoliu cu studii de caz,
 generare reală de CV-uri PDF (Modern, stil Europass, ATS, tipărire) și un panou de administrare protejat.
@@ -60,7 +60,7 @@ docs/                   Documentația proiectului (vezi mai jos)
 | [docs/SECURITY.md](docs/SECURITY.md) | Threat model (STRIDE) și raportul de audit de securitate |
 | [docs/TESTING.md](docs/TESTING.md) | Strategia și raportul de testare (rezultate reale) |
 | [docs/CI-CD.md](docs/CI-CD.md) | Workflow-uri, diagramă CI/CD, secrete, branch protection |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Supabase, Vercel, DNS pentru `ciupiustefan.com`, variabile de mediu |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Supabase, Vercel, DNS pentru `ciupitustefan.com`, variabile de mediu |
 | [docs/OPERATIONS.md](docs/OPERATIONS.md) | Monitorizare, backup, restaurare, rollback, incidente, mentenanță, VM Google Cloud |
 | [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) | Ghidul de administrare a conținutului |
 | [docs/GDPR.md](docs/GDPR.md) | Inventarul prelucrărilor și măsurile de protecție a datelor |

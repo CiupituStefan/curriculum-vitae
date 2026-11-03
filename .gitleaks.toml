@@ -1,4 +1,4 @@
-title = "ciupiustefan.com gitleaks config"
+title = "ciupitustefan.com gitleaks config"
 [extend]
 useDefault = true
 [allowlist]

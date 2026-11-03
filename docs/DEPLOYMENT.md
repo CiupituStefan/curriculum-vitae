@@ -1,10 +1,7 @@
-# Deployment — Supabase, Vercel și domeniul `ciupiustefan.com`
+# Deployment — Supabase, Vercel și domeniul `ciupitustefan.com`
 
 > Starea actuală: codul este pe GitHub, iar CI rulează. **Nu am acces la contul tău Vercel, Supabase sau Google Cloud**, așa că pașii de mai jos
 > trebuie făcuți de tine (durează ~30–45 de minute). Nimic din acest document nu modifică VM-ul Google Cloud.
->
-> ⚠️ Verifică ortografia domeniului: în cerințe apare `ciupiustefan.com`, iar numele tău este *Ciupitu*. Codul folosește valoarea
-> din `NEXT_PUBLIC_SITE_URL`, deci e suficient să setezi variabila la domeniul real.
 
 ## 1. Ordinea pașilor
 
@@ -51,7 +48,7 @@
 
    | Variabilă | Valoare |
    |---|---|
-   | `NEXT_PUBLIC_SITE_URL` | `https://ciupiustefan.com` (Production) |
+   | `NEXT_PUBLIC_SITE_URL` | `https://ciupitustefan.com` (Production) |
    | `NEXT_PUBLIC_SUPABASE_URL` | Project URL |
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | cheia publishable |
    | `SUPABASE_SECRET_KEY` | cheia secret — **Sensitive** |
@@ -67,8 +64,8 @@
 
 ## 4. Domeniul (Google Cloud → Vercel)
 
-1. Vercel → Project → **Settings → Domains** → adaugă `ciupiustefan.com` și `www.ciupiustefan.com`. Alege ca domeniu principal
-   `ciupiustefan.com`, cu `www` redirecționat permanent (308) spre el (redirecționarea canonică).
+1. Vercel → Project → **Settings → Domains** → adaugă `ciupitustefan.com` și `www.ciupitustefan.com`. Alege ca domeniu principal
+   `ciupitustefan.com`, cu `www` redirecționat permanent (308) spre el (redirecționarea canonică).
 2. Vercel afișează **exact** înregistrările necesare (de regulă un `A` pentru apex și un `CNAME` pentru `www`, cu valori specifice
    proiectului). **Folosește valorile afișate de Vercel; nu copia IP-uri din alte surse.**
 3. Google Cloud Console → **Network services → Cloud DNS** → zona domeniului (dacă domeniul folosește Cloud DNS; altfel în
@@ -84,12 +81,12 @@
 ## 5. Verificare finală (checklist)
 
 ```bash
-dig +short ciupiustefan.com A
-dig +short www.ciupiustefan.com CNAME
-curl -sI http://ciupiustefan.com | head -3          # 308 → https
-curl -sI https://www.ciupiustefan.com | head -3     # 308 → https://ciupiustefan.com
-curl -sI https://ciupiustefan.com/ro | grep -iE "strict-transport|content-security|x-frame"
-curl -s https://ciupiustefan.com/api/health          # {"status":"ok","database":"ok",…}
+dig +short ciupitustefan.com A
+dig +short www.ciupitustefan.com CNAME
+curl -sI http://ciupitustefan.com | head -3          # 308 → https
+curl -sI https://www.ciupitustefan.com | head -3     # 308 → https://ciupitustefan.com
+curl -sI https://ciupitustefan.com/ro | grep -iE "strict-transport|content-security|x-frame"
+curl -s https://ciupitustefan.com/api/health          # {"status":"ok","database":"ok",…}
 ```
 
 - [ ] <https://www.ssllabs.com/ssltest/> → nota A sau A+
@@ -99,4 +96,4 @@ curl -s https://ciupiustefan.com/api/health          # {"status":"ok","database"
 - [ ] Creează un proiect draft, încarcă o imagine și un PDF, publică-l, apoi șterge-l
 - [ ] Trimite un mesaj din formular și verifică-l în `/admin/messages` (și în e-mail, dacă Resend este configurat)
 - [ ] Workflow-ul „Post-deploy checks” este verde (GitHub → Actions)
-- [ ] Google Search Console: adaugă proprietatea și trimite `https://ciupiustefan.com/sitemap.xml`
+- [ ] Google Search Console: adaugă proprietatea și trimite `https://ciupitustefan.com/sitemap.xml`

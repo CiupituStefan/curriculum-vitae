@@ -12,7 +12,7 @@ describe("CV PDF generation", () => {
   for (const locale of LOCALES) {
     for (const format of CV_FORMATS) {
       it(`renders a valid ${format} PDF in ${locale} with selectable, complete text`, async () => {
-        const buffer = await renderCvPdf(format, locale, seedContent, seedProjects, "https://ciupiustefan.com");
+        const buffer = await renderCvPdf(format, locale, seedContent, seedProjects, "https://ciupitustefan.com");
         expect(buffer.subarray(0, 5).toString()).toBe("%PDF-");
         if (process.env.PDF_OUT) {
           await mkdir(process.env.PDF_OUT, { recursive: true });

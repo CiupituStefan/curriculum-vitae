@@ -1,5 +1,5 @@
 -- =============================================================================
--- ciupiustefan.com — initial schema
+-- ciupitustefan.com — initial schema
 -- Security model: RLS on every table; anon can only read published content;
 -- writes require an authenticated user listed in admin_users (is_admin()).
 -- Privileged maintenance (rate limit, retention, contact inserts) runs only as service_role.

@@ -19,7 +19,7 @@ export async function sendContactNotification(input: {
         from: CONTACT_FROM_EMAIL,
         to: [CONTACT_TO_EMAIL],
         reply_to: input.email,
-        subject: `[ciupiustefan.com] ${input.subject || "Mesaj nou / New message"}`.slice(0, 200),
+        subject: `[ciupitustefan.com] ${input.subject || "Mesaj nou / New message"}`.slice(0, 200),
         // Plain text only: no HTML rendering of visitor input, so no HTML injection in the inbox.
         text: `${input.name} <${input.email}>\n\n${input.message}`,
       }),

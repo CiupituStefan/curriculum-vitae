@@ -54,7 +54,7 @@
 
 Interpretare onestă: valorile sunt de laborator, într-un container fără CDN și cu CPU limitat, sub throttling simulat de „slow 4G”.
 LCP (~3–4 s) este dominat de „render delay” în simulare; CLS este 0 peste tot. Valorile reale (field data) trebuie urmărite după lansare
-cu Vercel Speed Insights sau PageSpeed Insights pe `https://ciupiustefan.com`. Optimizări existente: Server Components (puțin JS),
+cu Vercel Speed Insights sau PageSpeed Insights pe `https://ciupitustefan.com`. Optimizări existente: Server Components (puțin JS),
 fonturi self-hosted cu fallback ajustat, `next/image` AVIF/WebP, portret cu placeholder blur și `fetchPriority="high"`.
 
 ## 5. Ce nu a putut fi testat aici (și cum se testează)

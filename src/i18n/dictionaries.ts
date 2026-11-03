@@ -16,7 +16,7 @@ const ro = {
     contactTitle: "Contact",
     contactDescription: "Trimite-mi un mesaj pentru oportunități profesionale sau colaborări.",
     privacyTitle: "Politica de confidențialitate",
-    privacyDescription: "Cum sunt prelucrate datele personale pe ciupiustefan.com.",
+    privacyDescription: "Cum sunt prelucrate datele personale pe ciupitustefan.com.",
   },
   nav: {
     home: "Acasă",
@@ -231,7 +231,7 @@ const en: Dictionary = {
     contactTitle: "Contact",
     contactDescription: "Send me a message about job opportunities or collaborations.",
     privacyTitle: "Privacy policy",
-    privacyDescription: "How personal data is processed on ciupiustefan.com.",
+    privacyDescription: "How personal data is processed on ciupitustefan.com.",
   },
   nav: {
     home: "Home",

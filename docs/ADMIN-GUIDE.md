@@ -1,6 +1,6 @@
 # Ghid de administrare
 
-Panoul este la **`/admin`** (de exemplu `https://ciupiustefan.com/admin`). Nu există link public spre el, iar motoarele de căutare nu îl indexează.
+Panoul este la **`/admin`** (de exemplu `https://ciupitustefan.com/admin`). Nu există link public spre el, iar motoarele de căutare nu îl indexează.
 
 ## Autentificare
 

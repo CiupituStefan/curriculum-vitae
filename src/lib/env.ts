@@ -7,7 +7,7 @@ import { z } from "zod";
  */
 
 const publicSchema = z.object({
-  NEXT_PUBLIC_SITE_URL: z.url().default("https://ciupiustefan.com"),
+  NEXT_PUBLIC_SITE_URL: z.url().default("https://ciupitustefan.com"),
   NEXT_PUBLIC_SUPABASE_URL: z.url().optional(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(20).optional(),
 });

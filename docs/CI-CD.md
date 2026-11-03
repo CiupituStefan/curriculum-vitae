@@ -6,7 +6,7 @@
 concurente și fără token Vercel stocat în GitHub):
 
 - fiecare Pull Request → **Preview Deployment** cu URL propriu;
-- push / merge pe branch-ul de producție → **Production Deployment** pe `ciupiustefan.com`;
+- push / merge pe branch-ul de producție → **Production Deployment** pe `ciupitustefan.com`;
 - **rollback** instant din Vercel (vezi `OPERATIONS.md` §4).
 
 GitHub Actions face verificările: înainte de merge (CI obligatoriu prin branch protection) și după deployment (smoke tests + ZAP).

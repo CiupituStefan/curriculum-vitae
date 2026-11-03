@@ -3,6 +3,8 @@
 Conținutul a fost preluat **exclusiv** din cele trei documente furnizate (CV FlowCV din 05.10.2026, CV Europass lung, CV Europass scurt).
 Nimic nu a fost inventat. Punctele de mai jos sunt neconcordanțe sau decizii care trebuie confirmate; toate pot fi corectate din panou.
 
+Domeniul confirmat: **ciupitustefan.com**.
+
 ## Neconcordanțe între documente (am folosit varianta Europass lungă, cu date exacte)
 
 | # | Element | FlowCV | Europass | Folosit pe site |

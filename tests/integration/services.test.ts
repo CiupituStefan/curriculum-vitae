@@ -15,7 +15,7 @@ const state = vi.hoisted(() => ({
 vi.mock("@/server/env.server", () => ({
   serverEnv: { IP_HASH_SALT: "test-salt-test-salt", SUPABASE_SECRET_KEY: "x".repeat(30), CONTACT_RETENTION_DAYS: 180 },
 }));
-vi.mock("@/lib/env", () => ({ isSupabaseConfigured: () => true, siteUrl: "https://ciupiustefan.com", publicEnv: {} }));
+vi.mock("@/lib/env", () => ({ isSupabaseConfigured: () => true, siteUrl: "https://ciupitustefan.com", publicEnv: {} }));
 vi.mock("@/server/supabase/clients", () => ({
   publicClient: () => ({}),
   serviceClient: () => ({}),
