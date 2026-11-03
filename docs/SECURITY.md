@@ -99,7 +99,7 @@ Suprafețe: paginile publice și parametrii lor (`locale`, `slug`, `?category`);
 | 7 | Upload | Teste unit: magic bytes, HTML/SVG/EXE deghizate, PDF cu JS/Launch, limită de mărime, nume de fișiere | Efectuat (validare). Upload end-to-end în Storage: **neefectuat** |
 | 8 | Dependențe | `npm audit --omit=dev`: **0 vulnerabilități**. `npm audit` complet: 16 moderate, toate tranzitive în ESLint (`minimatch` ReDoS), doar dev | Efectuat |
 | 9 | Detectarea secretelor | Scanare regex locală (chei Supabase, JWT, Resend, AWS, GitHub, chei private, parole) — doar fixture-uri de test; Gitleaks în CI pe tot istoricul | Efectuat local + Gitleaks în GitHub Actions pe tot istoricul (03.11.2026): fără scurgeri |
-| 10 | HTTPS / TLS | — | **Neefectuat**: domeniul nu este încă conectat la Vercel |
+| 10 | HTTPS / TLS | `vercel certs ls` (certificate emise automat pentru apex și www, reînnoire automată, 90 de zile); `curl`: `http://` → 308 `https://`, `www` → 308 apex, HSTS prezent | Efectuat pe `https://ciupitustefan.com` (03.11.2026). Nota SSL Labs: de verificat din browser |
 | 11 | Antete HTTP | Test E2E care verifică CSP, XFO, nosniff, HSTS, Referrer-Policy, absența `X-Powered-By` | Efectuat (local). ZAP baseline configurat post-deploy |
 | 12 | Testarea API-urilor | Integrare + E2E: `/api/cv` (8 variante, 404 pentru parametri invalizi/path traversal), `/api/health` (fără detalii interne), `/api/cron/retention` (401 fără/cu secret greșit) | Efectuat |
 | 13 | Loguri | Logger structurat cu redactare (chei sensibile, e-mailuri); testat unit; mesajele nu sunt logate | Efectuat |
@@ -127,7 +127,7 @@ Suprafețe: paginile publice și parametrii lor (`locale`, `slug`, `?category`);
 | R3 | Pentru PDF-uri de la terți, scanare antivirus (ex. ClamAV pe VM) — astăzi doar administratorul încarcă fișiere | Scăzută |
 | R4 | Fișierele draft sunt publice dacă URL-ul este cunoscut (UUID nepredictibil). Dacă e nevoie de confidențialitate, bucket privat + URL-uri semnate | Scăzută |
 | R5 | Activează Vercel Firewall / Attack Challenge Mode la nevoie; rate limit pe `/api/cv` | Scăzută |
-| R6 | Rulează după deployment: testele RLS pe proiectul real, ZAP baseline, verificarea TLS (SSL Labs) și `curl -I` pentru antete | Înaltă |
+| R6 | ~~Teste RLS pe proiectul real, TLS și antete~~ — efectuate pe 03.11.2026 (RLS: toate aserțiunile trec pe Supabase; 13/13 smoke tests pe domeniu). Rămân: ZAP baseline (rulează în `post-deploy.yml`) și SSL Labs | Medie |
 
 ## 7. Raportarea vulnerabilităților
 

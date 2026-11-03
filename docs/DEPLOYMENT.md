@@ -1,7 +1,9 @@
 # Deployment — Supabase, Vercel și domeniul `ciupitustefan.com`
 
-> Starea actuală: codul este pe GitHub, iar CI rulează. **Nu am acces la contul tău Vercel, Supabase sau Google Cloud**, așa că pașii de mai jos
-> trebuie făcuți de tine (durează ~30–45 de minute). Nimic din acest document nu modifică VM-ul Google Cloud.
+> **Stare (03.11.2026): în producție pe <https://ciupitustefan.com>.** Supabase `iacwbipueylgsolgeccr` (migrație + seed + RLS verificat),
+> Vercel `gogan1/curriculum-vitae` (regiunea `iad1`), Cloud DNS zona `ciupitustefan-com` din proiectul GCP `curriculum-vitae-513602`
+> (`A @ → 216.198.79.1, 64.29.17.1`; `CNAME www → 1b02ed6d7c72a024.vercel-dns-017.com.`), certificate TLS emise, `www` → apex (308).
+> Pașii de mai jos rămân ca procedură de refacere de la zero. VM-ul Google Cloud nu a fost modificat.
 
 ## 1. Ordinea pașilor
 
