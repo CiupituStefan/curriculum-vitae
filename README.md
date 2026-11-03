@@ -58,6 +58,7 @@ docs/                   Documentația proiectului (vezi mai jos)
 |---|---|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Justificarea stack-ului, straturi, diagrame (componente, flux de date, bază de date) |
 | [docs/SECURITY.md](docs/SECURITY.md) | Threat model (STRIDE) și raportul de audit de securitate |
+| [docs/AUDIT-2026-11.md](docs/AUDIT-2026-11.md) | Audit complet (securitate, GDPR, legal, SEO, accesibilitate, performanță) cu remedieri și stări |
 | [docs/TESTING.md](docs/TESTING.md) | Strategia și raportul de testare (rezultate reale) |
 | [docs/CI-CD.md](docs/CI-CD.md) | Workflow-uri, diagramă CI/CD, secrete, branch protection |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Supabase, Vercel, DNS pentru `ciupitustefan.com`, variabile de mediu |

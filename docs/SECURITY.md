@@ -1,5 +1,8 @@
 # Securitate — Threat Model și raport de audit
 
+> Actualizare 03.11.2026: auditul complet și remedierile (brute force distribuit, MFA admin aplicat în aplicație și în baza de date,
+> limite globale, dovada consimțământului, cereri GDPR) sunt în [`AUDIT-2026-11.md`](AUDIT-2026-11.md).
+
 > Data auditului: 3 noiembrie 2026 · Versiune auditată: commit-ul din branch-ul `claude/sweet-newton-fxxmx3`
 > Aplicația **nu este declarată 100% sigură**. Acest raport descrie verificările efectuate efectiv, rezultatele lor și riscurile reziduale.
 > Verificările care necesită mediul de producție (Supabase real, Vercel, domeniu) sunt marcate **„neefectuat”** și trebuie rulate după deployment.

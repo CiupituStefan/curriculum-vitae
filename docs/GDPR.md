@@ -29,6 +29,9 @@
 
 ## Drepturile persoanelor vizate — procedură
 
+> Din 03.11.2026: Admin → Mesaje → „Cereri privind datele personale” — căutare după e-mail exact, export JSON, ștergere completă.
+> Fiecare mesaj are `consent_at` și `privacy_version` (dovada consimțământului). Cookie-ul `NEXT_LOCALE` se setează doar la alegerea explicită a limbii.
+
 1. Cererea vine pe e-mail. Verifică identitatea (răspuns de pe aceeași adresă).
 2. Acces/portabilitate: exportă rândurile din `contact_messages` cu acel e-mail (SQL Editor) și trimite-le.
 3. Ștergere: șterge din `/admin/messages` (sau `delete from contact_messages where email = …`).
