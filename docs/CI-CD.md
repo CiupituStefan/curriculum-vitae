@@ -71,8 +71,8 @@ Nu pune niciodată `SUPABASE_SECRET_KEY` în GitHub. Secretele nu apar în logur
 
 ## 6. Branch protection (de configurat manual)
 
-> Notă: repository-ul era gol, așa că primul push a făcut ca `claude/sweet-newton-fxxmx3` să devină branch-ul implicit. Recomandare:
-> creează `main` din acest branch, setează-l ca implicit (Settings → General → Default branch) și ca **Production Branch** în Vercel.
+> Branch-ul `main` a fost creat din `claude/sweet-newton-fxxmx3`. Trebuie setat ca branch implicit (Settings → General →
+> Default branch) și ca **Production Branch** în Vercel.
 
 GitHub → Settings → Branches → Add rule (sau Rulesets) pentru `main`:
 
