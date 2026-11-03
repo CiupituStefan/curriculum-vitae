@@ -24,7 +24,7 @@
 - **Securitate** (art. 32): vezi `SECURITY.md` — RLS, criptare în tranzit (HTTPS/HSTS) și la repaus (Supabase), acces doar pentru admin.
 - **Ștergere sigură**: ștergere din panou (mesaj cu mesaj) și automată la 180 de zile; la ștergerea unui proiect se șterg și fișierele.
 - **Imagini**: metadatele EXIF/GPS sunt eliminate la încărcare.
-- **Transferuri**: Vercel și Resend sunt furnizori din SUA (SCC / Data Privacy Framework); baza de date Supabase este găzduită în SUA (East US — North Virginia), tot pe baza acestor garanții. Dacă preferi ca datele să rămână în UE, mută proiectul Supabase în Frankfurt și setează `regions: ["fra1"]` în `vercel.json`.
+- **Transferuri**: Vercel și Resend sunt furnizori din SUA (Resend trimite din regiunea UE eu-west-1) (SCC / Data Privacy Framework); baza de date Supabase este găzduită în SUA (East US — North Virginia), tot pe baza acestor garanții. Dacă preferi ca datele să rămână în UE, mută proiectul Supabase în Frankfurt și setează `regions: ["fra1"]` în `vercel.json`.
   Semnează DPA-urile disponibile în conturile Vercel, Supabase și Resend.
 
 ## Drepturile persoanelor vizate — procedură
